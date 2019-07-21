@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/metrue/fx/api"
 	"github.com/metrue/fx/env"
+	"github.com/phayes/freeport"
 	"github.com/urfave/cli"
 )
 
@@ -24,7 +25,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "fx"
 	app.Usage = "makes function as a service"
-	app.Version = "0.3.2"
+	app.Version = "0.3.21"
 
 	app.Commands = []cli.Command{
 		{
@@ -50,13 +51,25 @@ func main() {
 					Name:  "name, n",
 					Usage: "service name",
 				},
+				cli.IntFlag{
+					Name:  "port, p",
+					Usage: "port number",
+				},
 			},
 			Action: func(c *cli.Context) error {
 				name := c.String("name")
 				if name == "" {
 					name = uuid.New().String()
 				}
-				return fx().Up(name, c.Args().First())
+				port := c.Int("port")
+				if port == 0 {
+					freePort, err := freeport.GetFreePort()
+					if err != nil {
+						return err
+					}
+					port = freePort
+				}
+				return fx().Up(c.Args().First(), api.UpOptions{Name: name, Port: port})
 			},
 		},
 		{
