@@ -1,8 +1,8 @@
 OUTPUT_DIR=./build
 DIST_DIR=./dist
 
-install-deps:
-	dep ensure
+lint:
+	golangci-lint run
 
 generate:
 	packr
@@ -15,9 +15,6 @@ pull:
 
 cross: generate
 	goreleaser --snapshot --skip-publish --skip-validate
-
-release: generate
-	./scripts/release.sh
 
 clean:
 	rm -rf ${OUTPUT_DIR}

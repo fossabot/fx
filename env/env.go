@@ -8,10 +8,8 @@ import (
 	"github.com/apex/log"
 	dockerTypes "github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/metrue/fx/constants"
 )
-
-// DockerRemoteAPIEndpoint docker remote api
-const DockerRemoteAPIEndpoint = "127.0.0.1:1234"
 
 type containerInfo struct {
 	ID         string                     `json:"Id"`
@@ -33,7 +31,7 @@ func runProxy() error {
 		"-v",
 		"/var/run/docker.sock:/var/run/docker.sock",
 		"-p",
-		DockerRemoteAPIEndpoint+":1234",
+		constants.DockerRemoteAPIEndpoint+":1234",
 		"bobrik/socat",
 		"TCP-LISTEN:1234,fork",
 		"UNIX-CONNECT:/var/run/docker.sock",
@@ -52,7 +50,13 @@ func proxyDockerSock() error {
 		name,
 	)
 	var infos []containerInfo
-	stdoutStderr, err := cmd.CombinedOutput()
+	// TODO use dockerd rest API
+	// docker inspect <name>
+	// it will returns:
+	// []
+	// Error: No such object: <name>
+	// when no such container
+	stdoutStderr, _ := cmd.CombinedOutput()
 	if err := json.Unmarshal(stdoutStderr, &infos); err != nil {
 		// no proxy container created
 		return runProxy()
@@ -78,8 +82,7 @@ func proxyDockerSock() error {
 			"start",
 			name,
 		)
-		_, err = cmd.CombinedOutput()
-		if err != nil {
+		if _, err := cmd.CombinedOutput(); err != nil {
 			return err
 		}
 	}
@@ -100,6 +103,7 @@ func Init() error {
 		"metrue/fx-python-base",
 		"metrue/fx-node-base",
 		"metrue/fx-d-base",
+		"metrue/fx-go-base",
 	}
 
 	var wg sync.WaitGroup

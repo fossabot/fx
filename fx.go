@@ -7,13 +7,14 @@ import (
 	"github.com/apex/log"
 	"github.com/google/uuid"
 	"github.com/metrue/fx/api"
+	"github.com/metrue/fx/constants"
 	"github.com/metrue/fx/env"
 	"github.com/phayes/freeport"
 	"github.com/urfave/cli"
 )
 
 func fx() *api.API {
-	endpoint := "http://" + env.DockerRemoteAPIEndpoint
+	endpoint := "http://" + constants.DockerRemoteAPIEndpoint
 	version, err := api.Version(endpoint)
 	if err != nil {
 		panic(err)
@@ -25,7 +26,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "fx"
 	app.Usage = "makes function as a service"
-	app.Version = "0.3.21"
+	app.Version = "0.3.22"
 
 	app.Commands = []cli.Command{
 		{

@@ -1,11 +1,14 @@
 workflow "build and push to dockerhub" {
   on = "push"
   resolves = [
+    "lint",
     "login",
     "build-fx-node-image",
     "push-fx-node-image",
     "build-fx-rust-image",
     "push-fx-rust-image",
+    "build-fx-go-image",
+    "push-fx-go-image",
     "notify"
   ]
 }
@@ -27,6 +30,17 @@ action "push-fx-node-image" {
   args = "push metrue/fx-node-base:latest"
 }
 
+action "build-fx-go-image" {
+  uses = "actions/docker/cli@master"
+  args = "build -t metrue/fx-go-base:latest -f api/asserts/dockerfiles/base/go/Dockerfile api/asserts/dockerfiles/base/go"
+}
+
+action "push-fx-go-image" {
+  needs = ["build-fx-go-image", "login"]
+  uses = "actions/docker/cli@master"
+  secrets = ["DOCKER_USERNAME", "DOCKER_PASSWORD"]
+  args = "push metrue/fx-go-base:latest"
+}
 
 action "build-fx-rust-image" {
   uses = "actions/docker/cli@master"
@@ -40,8 +54,17 @@ action "push-fx-rust-image" {
   args = "push metrue/fx-rust-base:latest"
 }
 
+action "lint" {
+  uses = "actions-contrib/golangci-lint@master"
+  args = "run"
+}
+
 action "notify" {
-  needs = ["push-fx-node-image", "push-fx-rust-image"]
+  needs = [
+    "push-fx-node-image",
+    "push-fx-rust-image",
+    "push-fx-go-image"
+  ]
   uses = "metrue/noticeme-github-action@master"
   secrets = ["NOTICE_ME_TOKEN"]
   args = ["BuildFxGitHubActionDone"]
