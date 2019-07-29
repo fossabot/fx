@@ -147,6 +147,14 @@ func main() {
 					Name:  "port, p",
 					Usage: "port number",
 				},
+				cli.StringFlag{
+					Name:  "cron, c",
+					Usage: "enable a cron task to call function after deployed",
+				},
+				cli.StringFlag{
+					Name:  "parameters, p",
+					Usage: "parameter to call function",
+				},
 			},
 			Action: func(c *cli.Context) error {
 				name := c.String("name")
