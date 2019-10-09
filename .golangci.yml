@@ -1,11 +1,13 @@
 run:
   concurrency: 4
   deadline: 10m
+  timeout: 10m
   issues-exit-code: 1
   tests: true
   skip-dirs:
     - examples
     - api/images
+    - test
   # skip-files:
 
 linters:
@@ -13,7 +15,7 @@ linters:
     - megacheck
     - govet
     - deadcode
-    - gocyclo
+    # - gocyclo
     - golint
     - varcheck
     - structcheck

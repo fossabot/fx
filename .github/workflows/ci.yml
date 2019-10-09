@@ -1,0 +1,94 @@
+on: push
+name: ci
+jobs:
+  Test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: setup Go 1.12
+        uses: actions/setup-go@v1
+        with:
+          version: 1.12
+        id: go
+
+      - name: check out
+        uses: actions/checkout@master
+
+      - name: setup docker
+        run: |
+          ./scripts/provision.sh
+
+      - name: setup k8s and kind
+        run: |
+          export GOBIN=$(go env GOPATH)/bin
+          export PATH=$PATH:$GOBIN
+          mkdir -p $GOBIN
+          curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+          chmod +x kubectl && mv kubectl $GOBIN
+          wget https://github.com/kubernetes-sigs/kind/releases/download/v0.5.0/kind-linux-amd64 && chmod +x kind-linux-amd64 && mv kind-linux-amd64 $GOBIN/kind
+          ./scripts/setup_kind.sh
+
+      - name: unit test
+        env:
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        run: |
+          export KUBECONFIG=/home/runner/.kube/kind-config-fx-test
+          DEBUG=true go test -v ./container_runtimes/... ./deploy/...
+
+      - name: build fx
+        run: |
+          make build
+
+      - name: lint
+        run: |
+          export GOBIN=$(go env GOPATH)/bin
+          export PATH=$PATH:$GOBIN
+          go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
+          golangci-lint run
+
+
+      - name: test fx cli
+        run: |
+          echo $KUBECONFIG
+          unset KUBECONFIG
+          make cli-test
+
+      - name: test AKS
+        env:
+          AKS_KUBECONFIG: ${{ secrets.AKS_KUBECONFIG }}
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          export KUBECONFIG=${HOME}/.kube/aks
+          echo ${AKS_KUBECONFIG} | base64 -d > $KUBECONFIG
+          DEBUG=true ./build/fx deploy -n hello -p 12345 examples/functions/JavaScript/func.js
+          ./build/fx destroy hello
+          rm ${KUBECONFIG}
+  Release:
+    runs-on: ${{ matrix.os }}
+    needs: [Test]
+    strategy:
+      fail-fast: true
+      matrix:
+        os:
+          - ubuntu-latest
+          - macOS-latest
+          - windows-latest
+        version:
+          - latest
+          - v0.117.0
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Set up Go
+        uses: actions/setup-go@v1
+        with:
+          version: '1.12'
+      - name: GoReleaser
+        if: github.ref == 'production'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: goreleaser/goreleaser-action@master
+        with:
+          version: ${{ matrix.version }}
+          args: release --rm-dist

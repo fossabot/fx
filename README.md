@@ -1,6 +1,5 @@
 fx
 ------
-
 Poor man's function as a service.
 <br/>
 ![build](https://circleci.com/gh/metrue/fx.svg?style=svg&circle-token=bd62abac47802f8504faa4cf8db43e4f117e7cd7)
@@ -10,60 +9,32 @@ Poor man's function as a service.
 ![](https://img.shields.io/github/license/metrue/fx.svg)
 [![Release](https://img.shields.io/github/release/metrue/fx.svg?style=flat-square)](https://github.com/metrue/fx/releases/latest)
 
+## Table of Contents
+- [Introduction](#introduction)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Contribute](#contribute)
+
+
+## Introduction
+
 fx is a tool to help you do Function as a Service on your own server. fx can make your stateless function a service in seconds. The most exciting thing is that you can write your functions with most programming languages.
 
-Feel free hacking fx to support the languages not listed. Welcome to tweet [me](https://twitter.com/_metrue) or [Buy me a coffee](https://www.paypal.me/minghe).
+Feel free hacking fx to support the languages not listed. Welcome to tweet me [@_metrue](https://twitter.com/_metrue) on Twitter, [@metrue](https://www.weibo.com/u/2165714507) on Weibo.
 
 
-| Language      | Status        | Contributor   |
-| ------------- |:-------------:|:-------------:|
-| Go            | Supported     | fx            |
-| Rust          | Supported     | [@FrontMage](https://github.com/FrontMage)|
-| Node          | Supported     | fx            |
-| Python        | Supported     | fx            |
-| Ruby          | Supported     | fx            |
-| Java          | Supported     | fx            |
-| PHP           | Supported     | [@chlins](https://github.com/chlins)|
-| Julia         | Supported     | [@mbesancon](https://github.com/mbesancon)|
-| D             | Supported     | [@andre2007](https://github.com/andre2007)|
-| R             | Working on [need your help](https://github.com/metrue/fx/issues/31)   | |
-
-## Architecture
-
-            ┌────────┐
-            │fx init │       fx━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-            └────────┘       ┃          ┌───────────────────────┐                                   ┃
-     ────────────────────────╋─────────▶│Environment initialize │                                   ┃
-            ┌──────┐         ┃          │* proxy docker sock    │                                   ┃
-            │fx up │         ┃          │* pull fx base docker  │                                   ┃
-    ┌ ─ ─ ─ ┴──────┘─ ─ ┐    ┃          └───────────────────────┘                                   ┃
-       Function Source       ┃          ┌──────────────┐       ┌─────────────────────────────┐      ┃
-    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘────╋──┬──────▶│     Pack     │       │                             │      ┃
-                             ┃  │       └──────┬───────┘       │                             │      ┃
-            ┌────────┐       ┃  │       ┌──────▼───────┐       │                             │      ┃
-            │fx call │       ┃  │       │Build Service │◀─────▶│                             │      ┃
-            └────────┘       ┃  │       └──────┬───────┘       │                             │      ┃
-    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐    ┃  │       ┌──────▼───────┐       │                             │      ┃
-       Function Source       ┃  │       │ Run Service  │◀─────▶│                             │      ┃
-    │   (with params)   │────╋──┤       └──────────────┘       │                             │      ┃
-     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─     ┃  │                              │                             │      ┃
-                             ┃  │                              │                             │      ┃
-                             ┃  │       ┌──────────────┐       │         Docker API          │      ┃
-           ┌────────┐        ┃  └──────▶│ Call Service │       │                             │      ┃
-           │fx down │        ┃          │    (http)    │       │                             │      ┃
-           └────────┘        ┃          └──────────────┘       │                             │      ┃
-     ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─     ┃          ┌──────────────┐       │                             │      ┃
-         Service Name   │────╋─────────▶│ Stop Service │◀─────▶│                             │      ┃
-     └ ─ ─ ─ ─ ─ ─ ─ ─ ─     ┃          └──────────────┘       │                             │      ┃
-          ┌────────┐         ┃                                 │                             │      ┃
-          │fx list │         ┃                                 │                             │      ┃
-          └────────┘         ┃                                 │                             │      ┃
-     ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─     ┃          ┌──────────────┐       │                             │      ┃
-         Service Name   │────╋─────────▶│List Services │◀─────▶│                             │      ┃
-     └ ─ ─ ─ ─ ─ ─ ─ ─ ─     ┃          └──────────────┘       └─────────────────────────────┘      ┃
-                             ┃                                                                      ┃
-                             ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
+| Language      | Status        | Contributor   | Example        |
+| ------------- |:-------------:|:-------------:| :-------------:|
+| Go            | Supported     | fx            | [/examples/Golang](https://github.com/metrue/fx/tree/master/examples/functions/Golang) |
+| Rust          | Supported     | [@FrontMage](https://github.com/FrontMage)| [/examples/Rust](https://github.com/metrue/fx/tree/master/examples/functions/Rust) |
+| Node          | Supported     | fx            | [/examples/JavaScript](https://github.com/metrue/fx/tree/master/examples/functions/JavaScript) |
+| Python        | Supported     | fx            | [/examples/Python](https://github.com/metrue/fx/tree/master/examples/functions/Python) |
+| Ruby          | Supported     | fx            | [/examples/Ruby](https://github.com/metrue/fx/tree/master/examples/functions/Ruby) |
+| Java          | Supported     | fx            | [/examples/Java](https://github.com/metrue/fx/tree/master/examples/functions/Java) |
+| PHP           | Supported     | [@chlins](https://github.com/chlins)| [/examples/PHP](https://github.com/metrue/fx/tree/master/examples/functions/PHP) |
+| Julia         | Supported     | [@matbesancon](https://github.com/matbesancon)| [/examples/Julia](https://github.com/metrue/fx/tree/master/examples/functions/Julia) |
+| D             | Supported     | [@andre2007](https://github.com/andre2007)| [/examples/D](https://github.com/metrue/fx/tree/master/examples/functions/D) |
+| R             | Working on [need your help](https://github.com/metrue/fx/issues/31)   | ||
 
 # Installation
 
@@ -78,13 +49,13 @@ brew install metrue/fx/fx
 
 via cURL
 
-```
+```shell
 curl -o- https://raw.githubusercontent.com/metrue/fx/master/scripts/install.sh | bash
 ```
 
 or Wget
 
-```
+```shell
 wget -qO- https://raw.githubusercontent.com/metrue/fx/master/scripts/install.sh | bash
 ```
 
@@ -99,7 +70,6 @@ You can go the release page to [download](https://github.com/metrue/fx/releases)
 Make sure [Docker](https://docs.docker.com/engine/installation/) installed and running on your server first. then type `fx -h` on your terminal to check out basic help.
 
 ```
-$ fx -h
 NAME:
    fx - makes function as a service
 
@@ -107,63 +77,202 @@ USAGE:
    fx [global options] command [command options] [arguments...]
 
 VERSION:
-   0.3.2
+   0.6.0
 
 COMMANDS:
-     init     initialize fx running enviroment
-     up       deploy a function or a group of functions
-     down     destroy a service
-     list     list deployed services
-     call     run a function instantly
-     help, h  Shows a list of commands or help for one command
+   infra     manage infrastructure of fx
+   image     manage image of service
+   doctor    health check for fx
+   up        deploy a function or a group of functions
+   down      destroy a service
+   list, ls  list deployed services
+   call      run a function instantly
+   help, h   Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
    --help, -h     show help
    --version, -v  print the version
 ```
 
-1. Initialize fx running enviroment
+1. List your current machines and activate you machine
+
+```shell
+$ fx infra ls     # list machines
+
+{
+	"localhost": {
+		"Host": "localhost",
+		"User": "",
+		"Password": "",
+		"Enabled": true,
+		"Provisioned": false
+	}
+}
+
+$ fx infra activate localhost    # activate 'localhost'
+
+2019/08/10 13:21:20  info Provision:pull python Docker base iamge: ✓
+2019/08/10 13:21:21  info Provision:pull d Docker base image: ✓
+2019/08/10 13:21:23  info Provision:pull java Docker base image: ✓
+2019/08/10 13:21:28  info Provision:pull julia Docker base image: ✓
+2019/08/10 13:21:31  info Provision:pull node Docker base image: ✓
+2019/08/10 13:22:09  info Provision:pull go Docker base image: ✓
+2019/08/10 13:22:09  info provision machine localhost: ✓
+2019/08/10 13:22:09  info enble machine localhost: ✓
+```
+It may take seconds since `fx` needs to download some basic resources
+
+*Note* you can add a remote host as fx machine also,
+```
+$ fx infra add --name my_aws_vm --host 13.121.202.227 --user root --password yourpassword
+
+$ fx infra list
+{
+	"my_aws_vm": {
+		"Host": "13.121.202.227",
+		"User": "root",
+		"Password": "yourpassword",
+		"Enabled": false,
+		"Provisioned": false
+	},
+	"localhost": {
+		"Host": "localhost",
+		"User": "",
+		"Password": "",
+		"Enabled": true,
+		"Provisioned": true
+	}
+}
+
+$ fx infra activate my_aws_vm
 
 ```
-fx init
-```
-It may take minutes since `fx` needs to download some basic resources
+then your function will be deployed onto remote host also.
 
 2. Write a function
 
 You can check out [examples](https://github.com/metrue/fx/tree/master/examples/functions) for reference. Let's write a function as an example,  it calculates the sum of two numbers then returns:
 
 ```js
-module.exports = (input, ctx) => {
-    return parseInt(input.a, 10) + parseInt(input.b, 10)
+module.exports = (ctx) => {
+    ctx.body = 'hello world'
 }
 ```
-Then save it to a file `sum.js`.
+Then save it to a file `func.js`.
 
 3. Deploy your function as a service
 
-```
-fx up sum.js
+Give your service a port with `--port`, and name with `--name`, heath checking with `--healthcheck` if you want.
+
+```shell
+$ fx up -name fx_service_name -p 10001 --healthcheck func.js
+
+2019/08/10 13:26:37  info Pack Service: ✓
+2019/08/10 13:26:39  info Build Service: ✓
+2019/08/10 13:26:39  info Run Service: ✓
+2019/08/10 13:26:39  info Service (fx_service_name) is running on: 0.0.0.0:10001
+2019/08/10 13:26:39  info up function fx_service_name(func.js) to machine localhost: ✓
 ```
 
-or give your service a name with `--name`
+if you want see what the source code of your service looks like, you can export it into a dirctory,
 
+```shell
+$ fx image export -o <path of dir> func.js
+2019/09/25 19:31:19  info exported to <path of dir>: ✓
 ```
-fx up --name service_sum sum.js
-```
-
-if everything ok, you will get an `url` for service.
 
 4. Test your service
 
 then you can test your service:
+
+```shell
+$ curl -v 0.0.0.0:10001
+
+
+GET / HTTP/1.1
+Accept: */*
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+Host: 0.0.0.0:10001
+User-Agent: HTTPie/1.0.2
+
+
+
+HTTP/1.1 200 OK
+Connection: keep-alive
+Content-Length: 11
+Content-Type: text/plain; charset=utf-8
+Date: Sat, 10 Aug 2019 05:28:03 GMT
+
+hello world
+
 ```
-curl -X POST <service address> -H "Content-Type: application/json" -d '{"a": 1, "b": 1}'
+
+## Docker
+
+  TODO
+
+## Kubernetes
+
+**fx** supports deploy function to be a service onto Kubernetes cluster infrasture, and we encourage you to do that other than on bare Docker environment, there are lots of advantage to run your function on Kubernetes like self-healing, load balancing, easy horizontal scaling, etc. It's pretty simple to deploy your function onto Kubernetes with **fx**, you just set KUBECONFIG in your enviroment.
+
+```shell
+KUBECONFIG=<Your KUBECONFIG> fx deploy -n fx-service-abc_js -p 12349 examples/functions/JavaScript/func.js   # function will be deploy to your Kubernetes cluster and expose a IP address of your loadbalencer
 ```
+
+or
+
+```shell
+$ export KUBECONFIG=<Your KUBECONFIG>
+$ fx deploy -n fx-service-abc_js -p 12349 examples/functions/JavaScript/func.js   # function will be deploy to your Kubernetes cluster and expose a IP address of your loadbalencer
+```
+
+* Local Kubernetes Cluster
+
+Docker for Mac and Docker for Windows already support Kubernetes with single node cluster, we can use it directly, and the default `KUBECONFIG` is `~/.kube/config`.
+
+```shell
+$ export KUBECONFIG=~/.kube/config  # then fx will take the config to deloy function
+```
+
+if you have multiple Kubernetes clusters configured, you have to set context correctly. FYI [configure-access-multiple-clusters](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/)
+
+* Azure Kubernetes Service (AKS)
+
+You should create a Kubernetes cluster if you don't have one on AKS, detail document can found [here](https://docs.microsoft.com/en-us/azure/aks/kubernetes-walkthrough).
+
+```shell
+$ az group create --name <myResourceGroup> --location eastus
+$ az aks create --resource-group <myResourceGroup> --name myAKSCluster --node-count <count>
+$ az aks get-credentials --resource-group <myResourceGroup> --name <myAKSCluster>
+```
+
+Then you can verify it with `kubectl`,
+
+```shell
+$ kubectl get nodes
+
+NAME                       STATUS   ROLES   AGE     VERSION
+aks-nodepool1-31718369-0   Ready    agent   6m44s   v1.12.8
+```
+
+Since AKS's config will be merged into `~/.kube/config` and set to be current context after you run `az aks get-credentials` command, so you can just set KUBECONFIG to default config also,
+
+```shell
+$ export KUBECONFIG=~/.kube/config  # then fx will take the config to deloy function
+```
+
+But we would suggest you run `kubectl config current-context` to check if the current context is what you want.
+
+* Amazon Elastic Kubernetes Service (EKS)
+  TODO
+
+* Google Kubernetes Engine (GKET)
+  TODO
 
 ## Contribute
 
-fx uses [Project](https://github.com/metrue/fx/projects) to manage the development.
+fx uses [Project](https://github.com/metrue/fx/projects/4) to manage the development.
 
 #### Prerequisites
 
@@ -175,7 +284,6 @@ Docker: make sure [Docker](https://docs.docker.com/engine/installation/) install
 ```
 $ git clone https://github.com/metrue/fx
 $ cd fx
-$ dep ensure
 $ make build
 ```
 
