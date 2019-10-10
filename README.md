@@ -2,6 +2,7 @@ fx
 ------
 Poor man's function as a service.
 <br/>
+![ci](https://github.com/metrue/fx/workflows/ci/badge.svg)
 ![build](https://circleci.com/gh/metrue/fx.svg?style=svg&circle-token=bd62abac47802f8504faa4cf8db43e4f117e7cd7)
 [![codecov](https://codecov.io/gh/metrue/fx/branch/master/graph/badge.svg)](https://codecov.io/gh/metrue/fx)
 [![Go Report Card](https://goreportcard.com/badge/github.com/metrue/fx?style=flat-square)](https://goreportcard.com/report/github.com/metrue/fx)
@@ -50,13 +51,11 @@ brew install metrue/fx/fx
 via cURL
 
 ```shell
+# Install to local directory
 curl -o- https://raw.githubusercontent.com/metrue/fx/master/scripts/install.sh | bash
-```
 
-or Wget
-
-```shell
-wget -qO- https://raw.githubusercontent.com/metrue/fx/master/scripts/install.sh | bash
+# Install to /usr/local/bin/
+curl -o- https://raw.githubusercontent.com/metrue/fx/master/scripts/install.sh | sudo bash
 ```
 
 fx will be installed into /usr/local/bin, sometimes you may need `source ~/.zshrc` or `source ~/.bashrc` to make fx available in `$PAHT`.
