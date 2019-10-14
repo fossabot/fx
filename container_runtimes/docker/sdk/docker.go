@@ -69,10 +69,9 @@ func (d *Docker) BuildImage(ctx context.Context, workdir string, name string) er
 	if err != nil {
 		return err
 	}
+	defer resp.Body.Close()
 
 	if os.Getenv("DEBUG") != "" {
-		defer resp.Body.Close()
-
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			return err
@@ -88,10 +87,10 @@ func (d *Docker) PushImage(ctx context.Context, name string) (string, error) {
 	username := os.Getenv("DOCKER_USERNAME")
 	password := os.Getenv("DOCKER_PASSWORD")
 	if username == "" || password == "" {
-		return "", fmt.Errorf("DOCKER_USERNAME and DOCKER_PASSWORD required for push image to registy")
+		return "", fmt.Errorf("DOCKER_USERNAME and DOCKER_PASSWORD required for push image to registry")
 	}
 
-	// TODO support private registy, like Azure Container registry
+	// TODO support private registry, like Azure Container registry
 	authConfig := dockerTypes.AuthConfig{
 		Username: username,
 		Password: password,
